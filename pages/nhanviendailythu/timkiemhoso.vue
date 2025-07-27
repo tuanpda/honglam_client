@@ -96,8 +96,13 @@
             </div>
           </div>
           <div class="column">
-            <label class="label">Số hồ sơ</label
-            ><input v-model="sohoso" type="text" class="input is-small" />
+            <label class="label">Điểm thu</label
+            >
+            <v-select
+            v-model="infodaily"
+            :options="dsdaily"
+            :get-option-label="option => `${option.name} - ${option.cccd}`"
+            />
           </div>
           <div class="column">
             <label class="label">Mã số BHXH</label
@@ -614,6 +619,9 @@ export default {
       dulieuHuyPheDuyet: [],
       isLoading: false,
       isExport: false,
+
+      dsdaily: [],
+      infodaily: '',
     };
   },
 
@@ -655,6 +663,7 @@ export default {
     this.getDateTime();
     this.getDmDiemthu();
     this.hosoLoitrave();
+    this.getDsdaily();
   },
 
   computed: {
@@ -704,6 +713,13 @@ export default {
   },
 
   methods: {
+    // cập nhật ngày 27 tháng 7 năm 2025
+    async getDsdaily(){
+      const res = await this.$axios.get(`/api/kekhai/danhsachdaily`)
+      // console.log(res.data.hs)
+      this.dsdaily=res.data.hs
+    },
+
     sortByField(field) {
       if (this.sortBy === field) {
         this.sortDesc = !this.sortDesc;
@@ -909,6 +925,8 @@ export default {
       // Xây dựng đường dẫn API dựa trên mã số thuế
 
       if (this.user.role == 2) {
+        // console.log(this.infodaily.name)
+        const tennguoitao=this.infodaily.name
         // const res = await this.$axios.get(
         //   `/api/kekhai/kykekhai-search-series-pagi-nvcty?kykekhai=${this.kykekhai}&page=${page}`
         // );
@@ -919,7 +937,7 @@ export default {
           // tạm thời bỏ điểm thu ra code ngày 07/5/2025. code sửa ngày 18/06/2025 bỏ kỳ kê khai ra khỏi thành phần tìm kiếm. thay vào đó là
           // trạng thái hồ sơ. đẩy query tên trangthaihs (đại diện thay cho trangthai và status_naptien)
           const res = await this.$axios.get(
-            `/api/kekhai/kykekhai-search-hoso-pheduyeths?trangthaihs=${this.trangthaihs}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&maloaihinh=${this.maloaihinh}&page=${page}`
+            `/api/kekhai/kykekhai-search-hoso-pheduyeths?tennguoitao=${tennguoitao}&trangthaihs=${this.trangthaihs}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&maloaihinh=${this.maloaihinh}&page=${page}`
           );
           // console.log(res);
           if (res.data.results.length > 0) {
