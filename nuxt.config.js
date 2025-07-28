@@ -38,8 +38,8 @@ export default {
   plugins: [
     { src: "~/plugins/sweetalert2", ssr: false },
     { src: "~/plugins/toasted", ssr: false },
-    { src: "~/plugins/filters" },
-    { src: "~/plugins/vue-select" },
+    { src: "~/plugins/filters", ssr: false },
+     { src: "~/plugins/vue-select", ssr: false },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
