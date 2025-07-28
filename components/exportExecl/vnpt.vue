@@ -467,8 +467,9 @@ export default {
         };
         row.getCell(36).value = item.cccd; // Cột AJ
 
-        row.getCell(38).value = 'VN'; // Cột AL
-        row.getCell(39).value = 'Kinh' // Cột AM
+        row.getCell(38).value = 'Việt Nam'; // Cột AL
+        row.getCell(39).value = 'VN' // Cột AN
+        row.getCell(40).value = 'Kinh' // Cột AM
 
         // add thêm thông tin tỉnh
         row.getCell(42).value = item.tentinh; // Từ cột AP
