@@ -102,7 +102,7 @@
             v-model="infodaily"
             :options="dsdaily"
             :get-option-label="option => `${option.name} - ${option.cccd}`"
-            :disable="user.role !==2"
+            :disabled="user.role !== 2"
             />
           </div>
           <div class="column">
@@ -927,7 +927,7 @@ export default {
 
       if (this.user.role == 2) {
         // console.log(this.infodaily.name)
-        const tennguoitao=this.infodaily.name
+        let tennguoitao = this.infodaily?.name || "";
         // const res = await this.$axios.get(
         //   `/api/kekhai/kykekhai-search-series-pagi-nvcty?kykekhai=${this.kykekhai}&page=${page}`
         // );
