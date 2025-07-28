@@ -3,7 +3,7 @@ import companyConfig from "~/config.company";
 
 export default async function ({ store, redirect, req, app, route }) {
   // console.log(req);
-  // console.log(req.headers.cookie);
+  console.log(req.headers.cookie);
   // console.log('Middleware chạy ở:', process.server ? 'Server' : 'Client');
   // console.log(companyConfig.port_backend);
   
