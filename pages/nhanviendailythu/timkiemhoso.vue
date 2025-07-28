@@ -102,6 +102,7 @@
             v-model="infodaily"
             :options="dsdaily"
             :get-option-label="option => `${option.name} - ${option.cccd}`"
+            :disable="user.role !==2"
             />
           </div>
           <div class="column">
