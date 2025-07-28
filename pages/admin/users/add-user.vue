@@ -681,7 +681,7 @@ export default {
         name: "",
         password: "",
         role: "", // nomal user
-        avatar: `${company.clientURL}/avatar/default-image.png`,
+        avatar: `${company.clientURL}avatar/default-image.png`,
         active: 1,
         // createdBy: this.$auth.user.username,
         createdAt: "",
