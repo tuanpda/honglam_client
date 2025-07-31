@@ -939,7 +939,7 @@ export default {
 
       if (this.user.role == 2) {
         const results = await this.getFullDataForExport();
-        // console.log(results);
+        console.log("đây là full", results);
         this.export_all = results;
 
         // console.log(this.infodaily.name)
@@ -956,7 +956,7 @@ export default {
           const res = await this.$axios.get(
             `/api/kekhai/kykekhai-search-hoso-pheduyeths?tennguoitao=${tennguoitao}&trangthaihs=${this.trangthaihs}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&maloaihinh=${this.maloaihinh}&page=${page}`
           );
-          // console.log(res);
+          console.log("đây là lọc:", res.data.results);
           if (res.data.results.length > 0) {
             this.data_kekhai = res.data.results;
             this.totalPages = res.data.info.pages;
@@ -1315,8 +1315,8 @@ export default {
     async getFullDataForExport() {
       const baseURL =
         this.user.role === 2
-          ? "/api/kekhai/kykekhai-search-hoso"
-          : "/api/kekhai/kykekhai-search-hoso-diemthu";
+          ? "/api/kekhai/kykekhai-search-hoso-pheduyeths"
+          : "/api/kekhai/kykekhai-search-hoso-diemthu-pheduyeths";
 
       const query = {
         trangthaihs: this.trangthaihs,
