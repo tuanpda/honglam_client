@@ -1,8 +1,11 @@
 <template>
   <footer class="footer">
     <div class="container">
-      <div class="columns">
-        <div class="column">
+      <div
+        class="columns is-align-items-center is-justify-content-space-between"
+      >
+        <!-- Cột trái -->
+        <div class="column has-text-centered">
           <div class="footer-row">
             <img
               src="@/assets/logos/an-sinh-bhxh-high-resolution-logo-black-transparent (1).png"
@@ -11,49 +14,33 @@
               height="40"
             />
           </div>
-          <div class="footer-row" style="font-size: small; font-weight: 700">
-            <span>© 2025</span>
-            <span>Term</span>
-            <span>Privacy</span>
+          <div class="footer-row">
+            <span>let's Start</span>
           </div>
         </div>
-        <div class="column">
-          <div
-            class="footer-row"
-            style="font-size: small; font-weight: 700; text-align: center"
-          >
-            <span>Designed & Developed by Son Thu Software Company</span>
-            <br />
-            <span
-              >Copyright @2025 | Designed with by
-              <span style="font-weight: 900; color: #f96854"
-                >司.馬.懿</span
-              ></span
-            >
+
+        <!-- Cột giữa -->
+        <div class="column has-text-centered">
+          <div class="footer-row">
+            <span>
+              Designed & Developed by
+              <span class="highlighted">司.馬.懿</span>
+            </span>
+          </div>
+          <div class="footer-row">
+            <span>Copyright from @2023</span>
           </div>
         </div>
-        <div class="column footer-right">
-          <div class="footer-right">
-            <div class="footer-row">
-              <i
-                class="fab fa-facebook"
-                style="font-size: 20px; margin-right: 10px"
-              ></i>
-              <i
-                class="fab fa-twitter"
-                style="font-size: 20px; margin-right: 10px"
-              ></i>
-              <i
-                class="fab fa-instagram"
-                style="font-size: 20px; margin-right: 10px"
-              ></i>
-            </div>
-            <div class="footer-row" style="font-size: small; font-weight: 700">
-              <span>Chắp cánh</span>
-              <span>sứ mệnh</span>
-              <span>An sinh</span>
-              <span>Xã hội</span>
-            </div>
+
+        <!-- Cột phải -->
+        <div class="column has-text-centered">
+          <div class="footer-row icons">
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-instagram"></i>
+          </div>
+          <div class="footer-row">
+            <span>Chắp cánh sứ mệnh An sinh Xã hội</span>
           </div>
         </div>
       </div>
@@ -65,25 +52,35 @@
 .footer {
   background-color: #f0f0f0;
   padding: 20px 0;
+  font-size: small;
+  font-weight: 700;
 }
 
-.footer .columns {
+.columns {
+  display: flex;
+  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
 
-.footer .column {
+.column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Căn bên trái */
-}
-
-.footer .footer-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .footer-row {
   margin-bottom: 10px;
+}
+
+.highlighted {
+  font-weight: 900;
+  color: #f96854;
+}
+
+.icons i {
+  font-size: 20px;
+  margin: 0 8px;
 }
 </style>

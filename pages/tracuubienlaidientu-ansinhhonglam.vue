@@ -90,10 +90,10 @@
 </template>
 
 <script>
-import Swal from "sweetalert2";
 import company from "@/config.company";
+import Swal from "sweetalert2";
+
 export default {
-  name: "LoginPage",
   layout: "none",
 
   data() {
@@ -115,27 +115,39 @@ export default {
         sobienlai: this.sobienlai,
       });
 
-      // console.log(res.data);
+      // console.log(res.data.hs);
       if (res.data.hs) {
         this.data = res.data.hs;
         this.viewXacnhan = true;
+        // console.log(this.data);
+        let pdfUrl = "";
+        if (this.data && this.data.urlNameInvoice) {
+          const trangthai = this.data.active;
 
-        // tạo tên file PDF từ sobienlai và hoten
-        const urlNameInvoice = res.data.hs.urlNameInvoice;
+          // pdfUrl = `${company.clientURL}/bienlaidientu/daky/${hs.urlNameInvoice}.pdf`;
+          if (trangthai !== 0) {
+            pdfUrl = `${company.clientURL}/bienlaidientu/${this.data.urlNameInvoice}.pdf`;
+          } else {
+            pdfUrl = `${company.clientURL}/bienlaidientu/bienlaidahuy/${this.data.urlNameInvoice}.pdf`;
+          }
 
-        // encode để tránh lỗi Unicode trong URL
-        let pdfUrl = `${company.clientURL}/bienlaidientu/${urlNameInvoice}.pdf`;
-        // console.log(this.pdfSrc);
+          // window.open(pdfUrl, "_blank");
 
-        // this.pdfSrc = `http://27.73.37.94:4042/bienlaidientu/0000003_Th%C3%A1i%20B%C3%A1%20Long.pdf`;
-
-        if (window.innerWidth < 768) {
-          // Nếu là mobile, mở tab mới
-          window.open(pdfUrl, "_blank");
+          if (window.innerWidth < 768) {
+            // Nếu là mobile, mở tab mới
+            window.open(pdfUrl, "_blank");
+          } else {
+            // Nếu không phải mobile, hiển thị trong iframe
+            this.viewXacnhan = true;
+            this.pdfSrc = pdfUrl;
+          }
         } else {
-          // Nếu không phải mobile, hiển thị trong iframe
-          this.viewXacnhan = true;
-          this.pdfSrc = pdfUrl;
+          console.warn("Thiếu thông tin số biên lai hoặc họ tên!");
+          this.$swal.fire({
+            icon: "error",
+            title: "Lỗi",
+            text: "Không lấy được thông tin biên lai.",
+          });
         }
       } else {
         const Toast = Swal.mixin({

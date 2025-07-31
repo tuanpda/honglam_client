@@ -96,13 +96,12 @@
             </div>
           </div>
           <div class="column">
-            <label class="label">Điểm thu</label
-            >
+            <label class="label">Điểm thu</label>
             <v-select
-            v-model="infodaily"
-            :options="dsdaily"
-            :get-option-label="option => `${option.name} - ${option.cccd}`"
-            :disabled="user.role !== 2"
+              v-model="infodaily"
+              :options="dsdaily"
+              :get-option-label="(option) => `${option.name} - ${option.cccd}`"
+              :disabled="user.role !== 2"
             />
           </div>
           <div class="column">
@@ -146,6 +145,18 @@
               </span>
               <span>HUỶ duyệt hồ sơ</span>
             </button>
+
+            <button
+              :disabled="user.role !== 2"
+              @click="xacnhanInlaibienlai()"
+              class="button is-small"
+            >
+              <span class="icon">
+                <i class="far fa-file-pdf"></i>
+              </span>
+              <span>In lại biên lai</span>
+            </button>
+
             <ExportExcel_VNPT_D05
               :disabled="!isExport"
               :data_execl="selectedItems_execl_export"
@@ -615,6 +626,7 @@ export default {
       selectedItems_execl_export: [], // ds xuất execl
       selectAll: false,
       selectAll_execl: false,
+      export_all: [],
 
       dulieuPheduyet: [],
       dulieuHuyPheDuyet: [],
@@ -622,7 +634,7 @@ export default {
       isExport: false,
 
       dsdaily: [],
-      infodaily: '',
+      infodaily: "",
     };
   },
 
@@ -715,10 +727,10 @@ export default {
 
   methods: {
     // cập nhật ngày 27 tháng 7 năm 2025
-    async getDsdaily(){
-      const res = await this.$axios.get(`/api/kekhai/danhsachdaily`)
+    async getDsdaily() {
+      const res = await this.$axios.get(`/api/kekhai/danhsachdaily`);
       // console.log(res.data.hs)
-      this.dsdaily=res.data.hs
+      this.dsdaily = res.data.hs;
     },
 
     sortByField(field) {
@@ -756,7 +768,7 @@ export default {
 
     toggleAll_execl() {
       if (this.selectAll_execl) {
-        this.selectedItems_execl_export = this.data_kekhai;
+        this.selectedItems_execl_export = this.export_all;
       } else {
         // Bỏ chọn tất cả
         this.selectedItems_execl_export = [];
@@ -926,6 +938,10 @@ export default {
       // Xây dựng đường dẫn API dựa trên mã số thuế
 
       if (this.user.role == 2) {
+        const results = await this.getFullDataForExport();
+        // console.log(results);
+        this.export_all = results;
+
         // console.log(this.infodaily.name)
         let tennguoitao = this.infodaily?.name || "";
         // const res = await this.$axios.get(
@@ -984,6 +1000,9 @@ export default {
       } else {
         try {
           // console.log(this.cccd);
+          const results = await this.getFullDataForExport();
+          // console.log(results);
+          this.export_all = results;
 
           const res = await this.$axios.get(
             `/api/kekhai/kykekhai-search-hoso-diemthu-pheduyeths?cccd=${this.cccd}&trangthaihs=${this.trangthaihs}&dotkekhai=${this.dotkekhai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&sohoso=${this.sohoso}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&madaily=${this.madaily}&maloaihinh=${this.maloaihinh}&page=${page}`
@@ -1029,48 +1048,6 @@ export default {
           });
         }
       }
-    },
-
-    async inLaiBienLaiDienTu(dataBienlaidientu) {
-      // NẾU HỦY THÀNH CÔNG THÌ HỦY BIÊN LAI VÀ GHI VÀO DỮ LIỆU
-      // gọi hàm tạo lại hóa đơn
-      const dateStr = dataBienlaidientu.ngaybienlai;
-      const year = dateStr.split(" ")[0].split("-")[2];
-      // console.log(dateStr, year);
-
-      const dataPost = {
-        hosoIdentity: dataBienlaidientu.hosoIdentity,
-        maSoBhxh: dataBienlaidientu.masobhxh,
-        hoTen: dataBienlaidientu.hoten,
-        soCccd: dataBienlaidientu.cccd,
-        ngaySinh: dataBienlaidientu.ngaysinh,
-        gioiTinh: dataBienlaidientu.gioitinh,
-        soDienThoai: dataBienlaidientu.sodienthoai,
-        nguoithutien: dataBienlaidientu.nguoithutien,
-        maloaihinh: dataBienlaidientu.loaihinh,
-        soTien: dataBienlaidientu.sotien,
-        soThang: dataBienlaidientu.sothang,
-        tuNgay: dataBienlaidientu.tungay,
-        denNgay: dataBienlaidientu.denngay,
-        tuThang: dataBienlaidientu.tuthang,
-        denThang: dataBienlaidientu.denthang,
-        maDaiLy: dataBienlaidientu.madaily,
-        tenDaiLy: dataBienlaidientu.tendaily,
-        sobienlai: dataBienlaidientu.sobienlai,
-        ngaybienlai: dataBienlaidientu.ngaybienlai,
-        tothon: dataBienlaidientu.tothon,
-        tenquanhuyen: dataBienlaidientu.tenquanhuyen,
-        tentinh: dataBienlaidientu.tentinh,
-        currentYear: year,
-        urlNameInvoice: dataBienlaidientu.urlNameInvoice,
-        cccd_nguoithutien: dataBienlaidientu.cccd_nguoithutien,
-        lydohuy: dataBienlaidientu.lydohuy,
-        ngayhuybienlai: dataBienlaidientu.ngayhuybienlai,
-        nguoihuybienlai: dataBienlaidientu.nguoihuybienlai,
-      };
-      // console.log(dataPost);
-
-      await this.inBienLaiDientu(dataPost);
     },
 
     // HÀM XÁC NHẬN HỒ SƠ KE KHAI CHO TRƯỜNG STATUS_NAPTIEN==1
@@ -1146,7 +1123,6 @@ export default {
     },
 
     // HÀM HUỶ DUYỆT HỒ SƠ TRANGTHAI=1
-
     async xacHUYNhanBienLai() {
       // console.log(this.selectedItems);
 
@@ -1257,6 +1233,51 @@ export default {
       }
     },
 
+    // HÀM XÁC NHẬN IN LẠI BIÊN LAI
+    async xacnhanInlaibienlai() {
+      if (!this.selectedItems || this.selectedItems.length === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Chưa chọn hồ sơ",
+          text: "Vui lòng chọn ít nhất một hồ sơ trước khi xác nhận.",
+        });
+        return;
+      }
+
+      const { isConfirmed } = await Swal.fire({
+        showCancelButton: true,
+        confirmButtonText: "Xác nhận in lại biên lai",
+        cancelButtonText: "Hủy",
+      });
+
+      if (isConfirmed) {
+        // Thực hiện xử lý với lý do
+        // console.log("Lý do hủy duyệt:", lyDo);
+        this.isLoading = true;
+        try {
+          for (const item of this.selectedItems) {
+            // gọi lại tìm biên lai
+            const dataFindbl = {
+              hosoIdentity: item.hosoIdentity,
+            };
+            const res_finbl = await this.$axios.post(
+              `/api/kekhai/find-bienlaidientu-huybienlai`,
+              dataFindbl
+            );
+            // console.log(res_finbl.data.hs);
+            // const dataBienlaidientu = res_finbl.data.hs;
+            // console.log(dataBienlaidientu);
+            const dataBienlaidientu = res_finbl.data.hs;
+
+            // gọi hàm in lại biên lai
+            await this.inLaiBienlaidosaisot(dataBienlaidientu);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+
     closeDanhsachduyet() {
       this.selectedItems = [];
       this.dulieuPheduyet = [];
@@ -1290,7 +1311,47 @@ export default {
       this.filterData(page); // Di chuyển đến trang được chỉ định
     },
 
-    exportToExcel() {
+    // code ngày 31/7/2025 điều chỉnh lại việc xuất d03 d05 > 30 dòng
+    async getFullDataForExport() {
+      const baseURL =
+        this.user.role === 2
+          ? "/api/kekhai/kykekhai-search-hoso"
+          : "/api/kekhai/kykekhai-search-hoso-diemthu";
+
+      const query = {
+        trangthaihs: this.trangthaihs,
+        dotkekhai: this.dotkekhai,
+        ngaykekhai: this.ngaykekhaitu,
+        ngaykekhaiden: this.ngaykekhaiden,
+        sohoso: this.sohoso,
+        masobhxh: this.masobhxh,
+        hoten: this.hoten,
+        maloaihinh: this.maloaihinh,
+        page: 1,
+        limit: 99999,
+      };
+
+      if (this.user.role !== 2) {
+        query.cccd = this.cccd;
+        query.madaily = this.madaily;
+      }
+
+      const res = await this.$axios.get(baseURL, { params: query });
+      const results = res.data.results || [];
+      console.log(results);
+      // ✅ Giữ nguyên return để export Excel dùng
+      return results;
+    },
+
+    async exportToExcel() {
+      const results = await this.getFullDataForExport();
+      // console.log(results);
+      if (!results.length) {
+        this.$swal.fire("Không có dữ liệu để xuất!", "", "warning");
+        this.isLoading = false;
+        return;
+      }
+
       if (this.data_kekhai.length == 0) {
         const Toast = Swal.mixin({
           toast: true,
@@ -1308,15 +1369,22 @@ export default {
           title: `Chưa có dữ liệu hồ sơ`,
         });
       } else {
-        // 1. Chuyển đổi mảng dữ liệu thành worksheet
-        const worksheet = XLSX.utils.json_to_sheet(this.data_kekhai);
+        try {
+          // 1. Chuyển đổi mảng dữ liệu thành worksheet
+          const worksheet = XLSX.utils.json_to_sheet(results);
 
-        // 2. Tạo workbook và thêm worksheet
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+          // 2. Tạo workbook và thêm worksheet
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
-        // 3. Xuất file Excel
-        XLSX.writeFile(workbook, "hosokekhai.xlsx");
+          // 3. Xuất file Excel
+          XLSX.writeFile(workbook, "hosokekhai.xlsx");
+        } catch (err) {
+          console.error("❌ Lỗi export:", err);
+          this.$swal.fire("Lỗi khi xuất file!", "", "error");
+        } finally {
+          this.isLoading = false;
+        }
       }
     },
 
@@ -1807,6 +1875,361 @@ export default {
 
       // Gửi về backend
       await this.$axios.post("/api/kekhai/upload-bienlai-huy", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    },
+
+    async inLaiBienlaidosaisot(data) {
+      const doc = new jsPDF({
+        orientation: "l",
+        format: "a5",
+      });
+
+      // Kích thước trang PDF
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Kích thước ảnh bạn muốn (ví dụ: 100mm x 70mm)
+      const imageWidth = 100; // Chiều rộng của ảnh
+      const imageHeight = 70; // Chiều cao của ảnh
+
+      // Tính tọa độ để ảnh nằm chính giữa trang
+      const x = (pageWidth - imageWidth) / 2; // Căn giữa theo chiều ngang
+      const y = (pageHeight - imageHeight) / 2; // Căn giữa theo chiều dọc
+
+      // Thêm ảnh vào PDF
+      doc.addImage(backgroundImage, "PNG", x, y, imageWidth, imageHeight);
+      const img = new Image();
+      img.src = backgroundImage; // hoặc base64 string
+
+      const imageWidthHUY = 100; // Chiều rộng của ảnh
+      const imageHeightHUY = 70; // Chiều cao của ảnh
+      // // ĐOẠN NÀY PHẢI XEM XÉT VIỆC CHÈN ẢNH ĐÃ HỦY HOẶC XÁC NHẬN BIÊN LAI
+      doc.addImage(huyHoadon, "PNG", x, y, imageWidthHUY, imageHeightHUY);
+      const img_trangthai = new Image();
+      img_trangthai.src = huyHoadon; // hoặc base64 string
+
+      // lấy lại tâm trang
+      const centerXLydoHuy = pageWidth / 2; // Tâm ngang trang
+      doc.addFont("OpenSans-Bold-normal.ttf", "OpenSans-Bold", "bold");
+      doc.setFont("OpenSans-Bold", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor("#ff0000");
+      doc.text(`Lý do hủy biên lai: ${data.lydohuy}`, centerXLydoHuy, y + 75, {
+        align: "center",
+        fontWeight: "bold",
+      });
+      doc.text(`Người hủy: ${data.nguoihuybienlai}`, centerXLydoHuy, y + 80, {
+        align: "center",
+        fontWeight: "bold",
+      });
+      doc.text(`Ngày hủy: ${data.ngayhuybienlai}`, centerXLydoHuy, y + 85, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      // img.onload = () => {
+      //   console.log("✅ Ảnh đã load xong");
+      //   doc.addImage(img, "PNG", x, y, imageWidth, imageHeight);
+      //   console.log("➡️ Đã add image");
+      // };
+
+      // img.onerror = (err) => {
+      //   console.error("❌ Lỗi load ảnh:", err);
+      // };
+
+      // add the font to jsPDF
+      doc.addFont("OpenSans-Bold-normal.ttf", "OpenSans-Bold", "bold");
+      doc.setFont("OpenSans-Bold", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor("#04368c");
+      doc.text(`${company.bhxhName}`, 60, 10, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      doc.setFontSize(12);
+      doc.setTextColor("ff0000");
+      doc.text(`${company.companyName}`, 60, 17, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      // Đặt màu cho đường line (gạch chân)
+      doc.setDrawColor(248, 215, 218);
+      doc.setLineWidth(0.4); // Độ dày đường gạch
+
+      const y_line = 19; // Vị trí theo chiều dọc
+
+      // Di chuyển sang trái nhiều hơn và rút ngắn chiều dài
+      const x1 = 40; // điểm bắt đầu (trái)
+      const lineLength = 42; // chiều dài line
+      const x2 = x1 + lineLength;
+      doc.line(x1, y_line, x2, y_line);
+
+      doc.addFont("OpenSans-Bold-normal.ttf", "OpenSans-Bold", "bold");
+      doc.setFont("OpenSans-Bold", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor("#04368c");
+      doc.text(`Mẫu số: C45-BB `, 173, 11, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      doc.addFont(
+        "OpenSans_SemiCondensed-Italic-normal.ttf",
+        "OpenSans_SemiCondensed-Italic-normal",
+        "italic"
+      );
+      doc.setFont("OpenSans_SemiCondensed-Italic-normal", "italic");
+      doc.setFontSize(9);
+      doc.setTextColor("#04368c");
+      doc.text(`(Ban hành kèm theo Thông tư số 107/2017/TT-BTC `, 175, 15, {
+        align: "center",
+        fontWeight: "bold",
+      });
+      doc.text(`ngày 10/10/2017 của Bộ Tài chính) `, 175, 19, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      doc.addFont(
+        "OpenSans-ExtraBold-normal.ttf",
+        "OpenSans-ExtraBold-normal",
+        "bold"
+      );
+      doc.setFont("OpenSans-ExtraBold-normal", "bold");
+      doc.setFontSize(20);
+      doc.setTextColor("#dc143c");
+      doc.text(`BIÊN LAI THU TIỀN `, 105, 35, {
+        align: "center",
+        fontWeight: "bold",
+      });
+
+      doc.addFont(
+        "OpenSans_SemiCondensed-Italic-normal.ttf",
+        "OpenSans_SemiCondensed-Italic-normal",
+        "italic"
+      );
+      doc.setFont("OpenSans_SemiCondensed-Italic-normal", "italic");
+      doc.setFontSize(9);
+      doc.setTextColor("#00008b");
+      doc.text(
+        `Do ${company.companyNameThuong}, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
+        105,
+        41,
+        {
+          align: "center",
+          fontWeight: "bold",
+        }
+      );
+
+      const ngayBienLai = data.ngaybienlai.split(" ")[0];
+      doc.setFontSize(9);
+      doc.setTextColor("#00008b");
+      doc.text(`Ngày: `, 155, 50, {
+        fontWeight: "bold",
+      });
+      doc.text(`${ngayBienLai}`, 165, 50, {
+        fontWeight: "bold",
+      });
+
+      const year = data.ngaybienlai.split("-")[2].split(" ")[0];
+
+      doc.text(`Ký hiệu: `, 155, 55, {
+        fontWeight: "bold",
+      });
+      doc.text(`${data.maloaihinh}-${data.maDaiLy}-${year}`, 165, 55, {
+        fontWeight: "bold",
+      });
+
+      doc.text(`Số: `, 155, 60, {
+        fontWeight: "bold",
+      });
+      doc.text(`${data.sobienlai}`, 165, 60, {
+        fontWeight: "bold",
+      });
+
+      doc.addImage(qrcode, "PNG", 165, 25, 15, 15);
+      //font-times-new-roman-normal
+      const toadoXInfo = 10;
+      const toadoYInfo = 60;
+      doc.addFont(
+        "Times New Roman Bold-normal.ttf",
+        "Times New Roman Bold-normal",
+        "bold"
+      );
+      doc.setFont("Times New Roman Bold-normal", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor("#04368c");
+      doc.text(`Họ và tên người nộp:`, toadoXInfo, toadoYInfo, {
+        fontWeight: "bold",
+      });
+      doc.text(
+        `${data.hoTen} - Mã số BHXH: ${data.maSoBhxh}`,
+        toadoXInfo + 43,
+        toadoYInfo,
+        {
+          fontWeight: "bold",
+        }
+      );
+
+      const diachi = data.tenquanhuyen + "; " + data.tentinh;
+      // data.tothon + "; " +
+
+      doc.text(`Địa chỉ: `, toadoXInfo, toadoYInfo + 8, {
+        fontWeight: "bold",
+      });
+      doc.text(`${diachi}`, toadoXInfo + 16, toadoYInfo + 8, {
+        fontWeight: "bold",
+      });
+
+      var noidungText = "";
+
+      if (
+        data.maloaihinh == "AR" ||
+        data.maloaihinh == "BI" ||
+        data.maloaihinh == "WI"
+      ) {
+        noidungText = `Tiền đóng BHYT, phương thức đóng ${data.soThang} tháng, từ ngày ${data.tuNgay} đến ngày ${data.denNgay}`;
+      } else {
+        if (data.maphuongan !== "DB") {
+          noidungText = `Tiền đóng BHXH Tự nguyện, phương thức đóng ${data.soThang} tháng, từ ngày ${data.tuThang} đến ngày ${data.denThang}`;
+        } else {
+          noidungText = `BHXH Tự nguyện, ${data.tenphuongthucdong}, ${data.sothang} tháng, từ tháng ${data.tuThang}`;
+        }
+      }
+      doc.text(`Nội dung: `, toadoXInfo, toadoYInfo + 16, {
+        fontWeight: "bold",
+      });
+      doc.text(`${noidungText}`, toadoXInfo + 20, toadoYInfo + 16, {
+        fontWeight: "bold",
+      });
+
+      const formattedMoney = Number(data.soTien).toLocaleString("vi-VN");
+      // console.log(formattedMoney);
+
+      doc.text(`Số tiền thu: `, toadoXInfo, toadoYInfo + 24, {
+        fontWeight: "bold",
+      });
+      doc.text(`${formattedMoney}`, toadoXInfo + 24, toadoYInfo + 24, {
+        fontWeight: "bold",
+      });
+
+      doc.text(`(Loại tiền): VNĐ `, toadoXInfo + 100, toadoYInfo + 24, {
+        fontWeight: "bold",
+      });
+
+      let tienbangchuText = num2words(data.soTien);
+      let tienHoa = this.capitalizeFirstLetter(tienbangchuText);
+      tienHoa += " đồng./.";
+
+      doc.text(`(Viết bằng chữ: ${tienHoa}) `, toadoXInfo, toadoYInfo + 32, {
+        fontWeight: "bold",
+      });
+
+      doc.addFont(
+        "OpenSans-ExtraBold-normal.ttf",
+        "OpenSans-ExtraBold-normal",
+        "bold"
+      );
+      doc.setFont("OpenSans-ExtraBold-normal", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor("#04368c");
+      doc.text(`NGƯỜI NỘP TIỀN`, toadoXInfo + 20, toadoYInfo + 43, {
+        fontWeight: "bold",
+      });
+
+      doc.text(`NGƯỜI THU TIỀN`, toadoXInfo + 120, toadoYInfo + 43, {
+        fontWeight: "bold",
+      });
+
+      doc.addFont(
+        "OpenSans-ExtraBold-normal.ttf",
+        "OpenSans-ExtraBold-normal",
+        "bold"
+      );
+      doc.setFont("OpenSans-ExtraBold-normal", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor("#04368c");
+      doc.text(`${data.hoTen}`, toadoXInfo + 40, toadoYInfo + 75, {
+        fontWeight: "bold",
+        align: "center",
+      });
+
+      // doc.setFontSize(8);
+      // doc.setTextColor("#dc3545");
+      // doc.text(
+      //   `Đã được ký bởi: ${company.companyName}`,
+      //   toadoXInfo + 106,
+      //   toadoYInfo + 53,
+      //   {
+      //     fontWeight: "bold",
+      //   }
+      // );
+      // doc.text(
+      //   `Ngày ký: ${ngayBienLai}`,
+      //   toadoXInfo + 124,
+      //   toadoYInfo + 58,
+      //   {
+      //     fontWeight: "bold",
+      //   }
+      // );
+
+      doc.addFont(
+        "OpenSans-ExtraBold-normal.ttf",
+        "OpenSans-ExtraBold-normal",
+        "bold"
+      );
+      doc.setFont("OpenSans-ExtraBold-normal", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor("#04368c");
+
+      // Tâm mong muốn theo trục X
+      const centerX = toadoXInfo + 128;
+      doc.text(`${data.nguoithutien}`, centerX + 11, toadoYInfo + 75, {
+        align: "center",
+      });
+
+      doc.addFont(
+        "OpenSans_SemiCondensed-Italic-normal.ttf",
+        "OpenSans_SemiCondensed-Italic-normal",
+        "italic"
+      );
+      doc.setFont("OpenSans_SemiCondensed-Italic-normal", "italic");
+      doc.setFontSize(8);
+      doc.setTextColor("#04368c");
+      doc.text(
+        `Vui lòng tra cứu biên lai điện tử tại: `,
+        toadoXInfo + 54,
+        toadoYInfo + 82,
+        {
+          fontWeight: "bold",
+        }
+      );
+
+      doc.setFontSize(8);
+      doc.setTextColor("#dc143c");
+      doc.text(
+        `${company.urlBienlaidientu}`,
+        toadoXInfo + 92,
+        toadoYInfo + 82,
+        {
+          fontWeight: "bold",
+        }
+      );
+
+      const tenbienlai = data.urlNameInvoice;
+
+      const pdfBlob = doc.output("blob");
+
+      const formData = new FormData();
+      formData.append("pdf", pdfBlob, `${tenbienlai}.pdf`);
+
+      // Gửi về backend
+      await this.$axios.post("/api/kekhai/upload-bienlai", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
